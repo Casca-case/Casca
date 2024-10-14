@@ -405,8 +405,18 @@ const DesignConfigurator = ({
                 size="sm"
                 className="w-full"
               >
-                Continue
-                <ArrowRight className="h-4 w-4 ml-1.5 inline" />
+                {isPending ? (
+                  <>
+                    <span className="animate-spin mr-2">⌛</span>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="h-4 w-4 ml-1.5 inline" />
+                  </>
+                )}
+
               </Button>
             </div>
           </div>

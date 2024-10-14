@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    domains: ['image.pollinations.ai'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,6 +11,7 @@ const nextConfig = {
       },
     ],
   },
+  
 };
 
 export default nextConfig;
