@@ -1,7 +1,12 @@
-"use client"
+"use client";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
+import {
+  EffectCoverflow,
+  Pagination,
+  Navigation,
+  Autoplay,
+} from "swiper/modules";
 
 // Import Swiper styles
 import "swiper/css";
@@ -26,11 +31,15 @@ const Slider3D = () => {
         }}
         pagination={{ clickable: true }}
         navigation={true}
-        modules={[EffectCoverflow, Pagination, Navigation]}
+        autoplay={{
+          delay: 3000, // Delay between transitions (in milliseconds)
+          disableOnInteraction: false, // Continue autoplay after user interactions
+        }}
+        modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
         className="mySwiper"
       >
         {[1, 2, 3, 4].map((num) => (
-          <SwiperSlide key={num} className="bg-slate-50 rounded-lg shadow-lg">
+          <SwiperSlide key={num} className="bg-slate-50 rounded-lg ">
             <img
               src={`/slider_image${num}.png`}
               alt={`Slide ${num}`}
