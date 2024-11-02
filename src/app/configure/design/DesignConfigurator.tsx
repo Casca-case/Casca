@@ -1,3 +1,4 @@
+//Design Configurator
 "use client";
 
 import HandleComponent from "@/components/HandleComponent";
@@ -218,22 +219,17 @@ const DesignConfigurator = ({
         </Rnd>
       </div>
 
-      <div className="h-[37.5rem] w-full col-span-full lg:col-span-1 flex flex-col bg-white">
-        <ScrollArea className="relative flex-1 overflow-auto">
-          <div
-            aria-hidden="true"
-            className="absolute z-10 inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white pointer-events-none"
-          />
-
-          <div className="px-8 pb-12 pt-8">
-            <h2 className="tracking-tight font-bold text-3xl">
+      <div className="h-[37.5rem] w-full col-span-full lg:col-span-1 flex flex-col bg-white rounded-lg shadow-sm">
+        <ScrollArea className="relative flex-1">
+          <div className="px-8 pb-14 pt-8 space-y-6">
+            <h2 className="tracking-tight font-bold text-2xl text-gray-900">
               Customize your case
             </h2>
 
-            <div className="w-full h-px bg-zinc-200 my-6" />
+            <div className="w-full h-px bg-zinc-200" />
 
-            <div className="relative mt-4 h-full flex flex-col justify-between">
-              <div className="flex flex-col gap-6">
+            <div className="space-y-6">
+              <div className="space-y-6">
                 <RadioGroup
                   value={options.color}
                   onChange={(val) => {
@@ -243,17 +239,20 @@ const DesignConfigurator = ({
                     }));
                   }}
                 >
-                  <Label>Color: {options.color.label}</Label>
-                  <div className="mt-3 flex items-center space-x-3">
+                  <Label className="text-base font-semibold">
+                    Color: {options.color.label}
+                  </Label>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
                     {COLORS.map((color) => (
                       <RadioGroup.Option
                         key={color.label}
                         value={color}
                         className={({ active, checked }) =>
                           cn(
-                            "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 active:ring-0 focus:ring-0 active:outline-none focus:outline-none border-2 border-transparent",
+                            "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 active:ring-0 focus:ring-0 active:outline-none focus:outline-none border-2 border-transparent transition-all duration-200",
                             {
-                              [`border-${color.tw}`]: active || checked,
+                              [`border-${color.tw} scale-110`]:
+                                active || checked,
                             }
                           )
                         }
@@ -261,33 +260,34 @@ const DesignConfigurator = ({
                         <span
                           className={cn(
                             `bg-${color.tw}`,
-                            "h-8 w-8 rounded-full border border-black border-opacity-10"
+                            "h-8 w-8 rounded-full border border-black border-opacity-10 transition-transform hover:scale-105"
                           )}
+                          aria-label={color.label}
                         />
                       </RadioGroup.Option>
                     ))}
                   </div>
                 </RadioGroup>
 
-                <div className="relative flex flex-col gap-3 w-full">
-                  <Label>Model</Label>
+                <div className="flex flex-col gap-3">
+                  <Label className="text-base font-semibold">Model</Label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        className="w-full justify-between"
+                        className="w-full justify-between py-5 text-base"
                       >
                         {options.model.label}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="w-[calc(100vw-4rem)] lg:w-[400px]">
                       {MODELS.options.map((model) => (
                         <DropdownMenuItem
                           key={model.label}
                           className={cn(
-                            "flex text-sm gap-1 items-center p-1.5 cursor-default hover:bg-zinc-100",
+                            "flex text-base gap-2 items-center p-3 cursor-pointer hover:bg-zinc-100 transition-colors",
                             {
                               "bg-zinc-100":
                                 model.label === options.model.label,
@@ -324,19 +324,19 @@ const DesignConfigurator = ({
                         }));
                       }}
                     >
-                      <Label>
+                      <Label className="text-base font-semibold">
                         {name.slice(0, 1).toUpperCase() + name.slice(1)}
                       </Label>
-                      <div className="mt-3 space-y-4">
+                      <div className="mt-3 space-y-3">
                         {selectableOptions.map((option) => (
                           <RadioGroup.Option
                             key={option.value}
                             value={option}
                             className={({ active, checked }) =>
                               cn(
-                                "relative block cursor-pointer rounded-lg bg-white px-6 py-4 shadow-sm border-2 border-zinc-200 focus:outline-none ring-0 focus:ring-0 outline-none sm:flex sm:justify-between",
+                                "relative block cursor-pointer rounded-lg bg-white px-4 py-4 shadow-sm border-2 border-zinc-200 focus:outline-none ring-0 focus:ring-0 outline-none sm:flex sm:justify-between hover:border-primary transition-colors duration-200",
                                 {
-                                  "border-primary": active || checked,
+                                  "border-primary shadow-md": active || checked,
                                 }
                               )
                             }
@@ -344,7 +344,7 @@ const DesignConfigurator = ({
                             <span className="flex items-center">
                               <span className="flex flex-col text-sm">
                                 <RadioGroup.Label
-                                  className="font-medium text-gray-900"
+                                  className="font-semibold text-gray-900"
                                   as="span"
                                 >
                                   {option.label}
@@ -353,7 +353,7 @@ const DesignConfigurator = ({
                                 {option.description ? (
                                   <RadioGroup.Description
                                     as="span"
-                                    className="text-gray-500"
+                                    className="text-gray-500 mt-1"
                                   >
                                     <span className="block sm:inline">
                                       {option.description}
@@ -367,7 +367,7 @@ const DesignConfigurator = ({
                               as="span"
                               className="mt-2 flex text-sm sm:ml-4 sm:mt-0 sm:flex-col sm:text-right"
                             >
-                              <span className="font-medium text-gray-900">
+                              <span className="font-semibold text-gray-900">
                                 {formatPrice(option.price / 100)}
                               </span>
                             </RadioGroup.Description>
@@ -380,45 +380,48 @@ const DesignConfigurator = ({
               </div>
             </div>
           </div>
+          <div
+            aria-hidden="true"
+            className="sticky bottom-0 z-10 h-12 bg-gradient-to-t from-white pointer-events-none"
+          />
         </ScrollArea>
 
-        <div className="w-full px-8 h-16 bg-white">
-          <div className="h-px w-full bg-zinc-200" />
-          <div className="w-full h-full flex justify-end items-center">
-            <div className="w-full flex gap-6 items-center">
-              <p className="font-medium whitespace-nowrap">
+        <div className="sticky bottom-0 w-full px-8 h-20 bg-white border-t border-zinc-200">
+          <div className="w-full h-full flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600 text-sm">Total:</span>
+              <p className="font-semibold text-xl">
                 {formatPrice(
                   (BASE_PRICE + options.finish.price + options.material.price) /
                     100
                 )}
               </p>
-              <Button
-                onClick={() =>
-                  saveConfig({
-                    configId,
-                    color: options.color.value,
-                    finish: options.finish.value,
-                    material: options.material.value,
-                    model: options.model.value,
-                  })
-                }
-                size="sm"
-                className="w-full"
-              >
-                {isPending ? (
-                  <>
-                    <span className="animate-spin mr-2">⌛</span>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Continue
-                    <ArrowRight className="h-4 w-4 ml-1.5 inline" />
-                  </>
-                )}
-
-              </Button>
             </div>
+            <Button
+              onClick={() =>
+                saveConfig({
+                  configId,
+                  color: options.color.value,
+                  finish: options.finish.value,
+                  material: options.material.value,
+                  model: options.model.value,
+                })
+              }
+              size="lg"
+              className="min-w-[160px] text-base font-medium"
+            >
+              {isPending ? (
+                <div className="flex items-center gap-2">
+                  <span className="animate-spin">⌛</span>
+                  Processing...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  Continue
+                  <ArrowRight className="h-5 w-5" />
+                </div>
+              )}
+            </Button>
           </div>
         </div>
       </div>

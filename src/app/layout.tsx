@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 import { Layout } from "lucide-react";
+import Chatbot from "./configure/chatbot/page";
 
 const recursive = Recursive({ subsets: ["latin"] });
 
@@ -21,6 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={recursive.className}>
+        <div className="h-12 w-12 z-50 fixed right-4 bottom-16">
+          <Chatbot />
+        </div>
         <Navbar />
         <main className="flex grainy-light flex-col min-h-[calc(100vh-3.5rem-1px)]">
           <div className="flex-1 flex flex-col h-full">
