@@ -4,7 +4,7 @@ Casca is an innovative e-commerce website where users can create customized smar
 
 [Visit Casca Website](https://casca-ten.vercel.app)
 
-# Showcase
+## Showcase
 
 ![Custom Cases Slideshow](./showcase.gif)
 
