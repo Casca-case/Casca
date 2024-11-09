@@ -1,4 +1,4 @@
-# Casca - Custom Smartphone Case E-commerce Platform
+# Casca - Modern E-commerce Platform
 
 Casca is an innovative e-commerce website where users can create customized smartphone cases. With Casca, users have the option to upload their own images or generate images using AI, as well as customize colors, resize images, choose different models, and select quality levels.
 
@@ -46,13 +46,16 @@ Ensure that you have Node.js installed on your system.
    ```bash
    git clone https://github.com/casca-case/casca.git
    cd casca
+   
 2. **Install the required packages**:
    ```bash
    npm install
+   
 3. **Set up environment variables**:
    Create a .env file in the root directory.
    Copy the content from env_example and update the values as needed.
-4. **Run the development server**:
+   
+5. **Run the development server**:
    ```bash
    npm run dev
   The application will be available at http://localhost:3000
