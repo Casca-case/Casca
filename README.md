@@ -1,8 +1,8 @@
 # Casca - Custom Smartphone Case E-commerce Platform
 
-[Visit Casca Website](https://casca-ten.vercel.app)
-
 Casca is an innovative e-commerce website where users can create customized smartphone cases. With Casca, users have the option to upload their own images or generate images using AI, as well as customize colors, resize images, choose different models, and select quality levels.
+
+[Visit Casca Website](https://casca-ten.vercel.app)
 
 ## Features
 
