@@ -56,14 +56,12 @@ Ensure that you have Node.js installed on your system.
 4. Proceed to checkout and pay using the secure Stripe payment gateway.
 
 ### Deployment
-# Casca is deployed on Vercel. To deploy your own version:
-
+**Casca is deployed on Vercel. To deploy your own version**:
 1. Push your repository to GitHub.
 2. Connect your GitHub repo to Vercel and deploy with a single click.
 
 ### Contributing
 **We welcome contributions! Please follow these steps**:
-
 1. Fork the repository.
 2. Create a new branch (git checkout -b feature/YourFeature).
 3. Commit your changes (git commit -m 'Add some feature').
