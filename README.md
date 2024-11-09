@@ -4,6 +4,14 @@ Casca is an innovative e-commerce website where users can create customized smar
 
 [Visit Casca Website](https://casca-ten.vercel.app)
 
+# Sample Custom Cases Slideshow
+
+<div align="center">
+  <img src="https://your-link-to-image1.com" alt="Sample Case 1" style="width:300px; margin: 10px;">
+  <img src="https://your-link-to-image2.com" alt="Sample Case 2" style="width:300px; margin: 10px;">
+  <img src="https://your-link-to-image3.com" alt="Sample Case 3" style="width:300px; margin: 10px;">
+</div>
+
 ## Features
 
 - **Upload Custom Images**: Personalize your phone case by uploading your own photos.
