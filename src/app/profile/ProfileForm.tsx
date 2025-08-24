@@ -92,12 +92,12 @@ export default function ProfileForm({ user }: ProfileFormProps) {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex flex-col gap-8">
+    <Card className="p-4 sm:p-6">
+      <div className="flex flex-col gap-6 sm:gap-8">
         {/* Profile Picture Section */}
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full border-2 border-gray-200 overflow-hidden">
+            <div className="w-28 h-28 sm:w-24 sm:h-24 rounded-full border-2 border-gray-200 overflow-hidden">
               {profileImage ? (
                 <Image
                   src={profileImage}
@@ -132,7 +132,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="flex-1 space-y-6"
+              className="w-full flex-1 space-y-4 sm:space-y-6"
             >
               <FormField
                 control={form.control}
@@ -202,25 +202,20 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                 )}
               />
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => form.reset()}
+                  className="w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save Changes</Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    // TODO: Implement forgot password logic
-                    window.location.href = "/forgot-password";
-                  }}
-                  className="ml-auto"
+                <Button 
+                  type="submit"
+                  className="w-full sm:w-auto"
                 >
-                  Change Password
+                  Save Changes
                 </Button>
               </div>
             </form>
