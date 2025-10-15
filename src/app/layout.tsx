@@ -6,9 +6,6 @@ import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 import { Layout } from "lucide-react";
 import Chatbot from "./configure/chatbot/page";
-import GoogleTranslate from "@/components/GoogleTranslate";
-import Script from "next/script";
-import CookieBanner from "@/components/CookieBanner";
 
 const recursive = Recursive({ subsets: ["latin"] });
 
@@ -35,12 +32,6 @@ export default function RootLayout({
           </div>
           <Footer />
         </main>
-        <CookieBanner />
-        <GoogleTranslate />
-        <Script
-          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );
