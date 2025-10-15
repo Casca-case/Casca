@@ -44,8 +44,8 @@ enum CaseColor {
   teal
   gray
   sky
-  pink
-  yellow
+  pink
+  yellow
 }
 
 model Configuration {
@@ -109,4 +109,17 @@ model BillingAddress {
   state       String?
   phoneNumber String?
   orders      Order[]
+}
+
+model Feedback {
+  id          String   @id @default(cuid())
+  category    String
+  nps         Int?
+  message     String
+  images      Json?    // Array of base64 strings
+  email       String?
+  okToContact Boolean
+  consent     Boolean
+
+  createdAt   DateTime @default(now())
 }

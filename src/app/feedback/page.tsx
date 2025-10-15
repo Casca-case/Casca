@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";   // ✅ import router
 
 type Category = "Bug report" | "Feature request" | "General feedback";
 
 interface FeedbackForm {
-  rating: number;            // 1–5 stars
   category: Category;
   nps: number | null;        // 0–10
   message: string;
@@ -16,7 +16,6 @@ interface FeedbackForm {
 
 export default function FeedbackPage() {
   const [form, setForm] = useState<FeedbackForm>({
-    rating: 0,
     category: "General feedback",
     nps: null,
     message: "",
@@ -28,6 +27,8 @@ export default function FeedbackPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const router = useRouter(); // ✅ for navigation
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -53,7 +54,6 @@ export default function FeedbackPage() {
   };
 
   const canSubmit =
-    form.rating > 0 &&
     form.message.trim().length > 0 &&
     form.consent &&
     !submitting;
@@ -63,15 +63,27 @@ export default function FeedbackPage() {
     if (!canSubmit) return;
     setSubmitting(true);
 
-    // TODO: POST to your API route when backend is ready.
-    // await fetch("/api/feedback", { method: "POST", body: JSON.stringify(form) });
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    // Demo success:
-    console.log("Feedback submitted:", form);
-    setSubmitted(true);
-    setSubmitting(false);
-    // Reset after a moment if you want
-    // setForm({ ...defaultState });
+      if (!response.ok) {
+        throw new Error("Failed to submit feedback");
+      }
+
+      console.log("Feedback submitted successfully");
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      alert("Failed to submit feedback. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -83,10 +95,10 @@ export default function FeedbackPage() {
             We appreciate you taking the time to help us improve.
           </p>
           <button
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white"
-            onClick={() => setSubmitted(false)}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => router.push("/")}   // ✅ redirect to homepage
           >
-            Submit another response
+            Return to Homepage
           </button>
         </div>
       </main>
@@ -101,28 +113,7 @@ export default function FeedbackPage() {
         onSubmit={handleSubmit}
         className="space-y-6 bg-white p-6 rounded-xl shadow-md"
       >
-        {/* Overall rating (stars) */}
-        <div>
-          <label className="block font-medium mb-2">Overall rating</label>
-          <div className="flex items-center gap-2">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                aria-label={`${n} star${n > 1 ? "s" : ""}`}
-                onClick={() => setForm((p) => ({ ...p, rating: n }))}
-                className={`text-3xl leading-none ${
-                  form.rating >= n ? "text-yellow-500" : "text-gray-300"
-                }`}
-              >
-                ★
-              </button>
-            ))}
-            {form.rating > 0 && (
-              <span className="text-sm text-gray-600">({form.rating}/5)</span>
-            )}
-          </div>
-        </div>
+        {/* ...removed stars rating section... */}
 
         {/* Category */}
         <div>
@@ -218,7 +209,7 @@ export default function FeedbackPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="block font-medium mb-2">
-              Email (optional, for follow-up)
+              Email 
             </label>
             <input
               type="email"
