@@ -34,6 +34,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "firebase": "^12.4.0",
     "form": "^0.2.5",
     "framer-motion": "^11.1.7",
     "input": "^1.0.1",

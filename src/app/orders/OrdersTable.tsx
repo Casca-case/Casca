@@ -10,27 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  ChevronRight,
-  Package,
-  Clock,
-  DollarSign,
-  Truck,
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface Order {
-  id: number;
-  productName: string;
-  purchaseDate: string;
-  orderPrice: number;
-  status: string;
-}
-
+// Firestore orders are plain JS objects, not Prisma types
 interface OrdersTableProps {
-  orders: Order[];
+  orders: any[];
 }
 
 const getStatusColor = (status: string) => {
@@ -48,9 +34,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default function OrdersTable({ orders }: OrdersTableProps) {
-  const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
-
+const OrderCard = ({ order }: { order: any }) => {
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "MMM d, yyyy");
   };
@@ -62,54 +46,91 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
     }).format(price);
   };
 
-  // Mobile card view for each order
-  const OrderCard = ({ order }: { order: Order }) => (
-    <Card className="p-4 space-y-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="font-medium">Order #{order.id}</p>
-          <p className="text-sm text-muted-foreground">{order.productName}</p>
-        </div>
-        <span
-          className={cn(
-            "px-2 py-1 rounded-full text-xs font-medium",
-            getStatusColor(order.status)
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, reason: 'User requested cancellation' })
+      });
+      if (!res.ok) throw new Error('Failed to cancel order');
+      // Optionally, refresh the page or update state
+      window.location.reload();
+    } catch (err) {
+      alert('Could not cancel order.');
+    }
+  };
+
+  return (
+    <Card>
+      <div className="p-4">
+        <div className="flex items-center gap-4">
+          {order.configuration.imageUrl && (
+            <img
+              src={order.configuration.imageUrl}
+              alt="Case"
+              className="w-16 h-16 object-cover rounded border"
+            />
           )}
-        >
-          {order.status}
-        </span>
+          <div>
+            <p className="font-medium">{order.configuration.model ? `${order.configuration.model} Case` : 'Custom Design'}</p>
+            <p className="text-sm text-muted-foreground">Order #{order.id}</p>
+            <p className="text-sm">{formatDate(order.createdAt.toString())}</p>
+            <p className="text-sm font-medium">{formatPrice(order.amount)}</p>
+            <span className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(order.status))}>
+              {order.status}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <a href={`/thank-you?orderId=${order.id}`} className="flex items-center gap-1 text-orange-600 hover:underline">
+            Details <ChevronRight className="w-4 h-4" />
+          </a>
+          <button
+            title="Cancel Order"
+            className="text-red-600 hover:text-red-800"
+            onClick={() => handleCancelOrder(order.id)}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+          >
+            <svg xmlns="http://www.w3.org/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 7h12M9 7V4h6v3m-7 4v9a2 2 0 002 2h4a2 2 0 002-2V11m-7 0h10" /></svg>
+          </button>
+        </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-muted-foreground" />
-          <span>{formatDate(order.purchaseDate)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-muted-foreground" />
-          <span>{formatPrice(order.orderPrice)}</span>
-        </div>
-      </div>
-
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() => setExpandedOrder(order.id === expandedOrder ? null : order.id)}
-      >
-        {order.id === expandedOrder ? "Hide Details" : "View Details"}
-      </Button>
-
-      {order.id === expandedOrder && (
-        <div className="pt-4 space-y-3 text-sm">
-          <p className="font-medium">Order Details</p>
-          {/* Add more order details here */}
-          <p className="text-muted-foreground">
-            Additional order information can be displayed here.
-          </p>
-        </div>
-      )}
     </Card>
   );
+};
+
+export default function OrdersTable({ orders }: OrdersTableProps) {
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const handleCancelOrder = async (orderId: string) => {
+    setCancellingId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, reason: 'User requested cancellation' })
+      });
+      if (!res.ok) throw new Error('Failed to cancel order');
+      // Optionally, refresh the page or update state
+      window.location.reload();
+    } catch (err) {
+      alert('Could not cancel order.');
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "MMM d, yyyy");
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
+  };
 
   return (
     <div>
@@ -138,9 +159,23 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
               {orders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.productName}</TableCell>
-                  <TableCell>{formatDate(order.purchaseDate)}</TableCell>
-                  <TableCell>{formatPrice(order.orderPrice)}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col items-center">
+                      {order.configuration.imageUrl && (
+                        <img
+                          src={order.configuration.imageUrl}
+                          alt="Case"
+                          className="w-16 h-16 object-cover rounded mb-2 border"
+                        />
+                      )}
+                      <span className="text-xs text-muted-foreground">{order.id}</span>
+                      <span className="block mt-1">
+                        {order.configuration.model ? `${order.configuration.model} Case` : 'Custom Design'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{formatDate(order.createdAt.toString())}</TableCell>
+                  <TableCell>{formatPrice(order.amount)}</TableCell>
                   <TableCell>
                     <span
                       className={cn(
@@ -152,17 +187,23 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex items-center gap-1"
-                      onClick={() =>
-                        setExpandedOrder(order.id === expandedOrder ? null : order.id)
-                      }
-                    >
-                      Details
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/thank-you?orderId=${order.id}`}
+                        className="flex items-center gap-1 text-orange-600 hover:underline"
+                      >
+                        Details
+                        <ChevronRight className="w-4 h-4" />
+                      </a>
+                      <button
+                        title="Cancel Order"
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => handleCancelOrder(order.id)}
+                        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 7h12M9 7V4h6v3m-7 4v9a2 2 0 002 2h4a2 2 0 002-2V11m-7 0h10" /></svg>
+                      </button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
