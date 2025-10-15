@@ -32,6 +32,12 @@ const Footer = () => {
               >
                 Cookie Policy
               </Link>
+              <Link
+                href="/feedback"
+                className="text-sm text-blue-600 font-semibold hover:underline ml-4"
+              >
+                Feedback
+              </Link>
             </div>
           </div>
         </div>
