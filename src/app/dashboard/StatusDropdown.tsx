@@ -14,10 +14,12 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { changeOrderStatus } from './actions'
 import { useRouter } from 'next/navigation'
 
-const LABEL_MAP: Record<keyof typeof OrderStatus, string> = {
-  awaiting_shipment: 'Awaiting Shipment',
-  fulfilled: 'Fulfilled',
-  shipped: 'Shipped',
+const LABEL_MAP: Record<OrderStatus, string> = {
+  PENDING: 'Pending',
+  PROCESSING: 'Processing',
+  SHIPPED: 'Shipped',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
 }
 
 const StatusDropdown = ({

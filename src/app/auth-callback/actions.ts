@@ -1,6 +1,6 @@
 'use server'
 
-import { firestoreService } from '@/lib/firestore'
+import { db } from '@/db'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 
 export const getAuthStatus = async () => {
@@ -11,12 +11,16 @@ export const getAuthStatus = async () => {
     throw new Error('Invalid user data')
   }
 
-  const existingUser = await firestoreService.getUser(user.id)
+  const existingUser = await db.user.findUnique({
+    where: { id: user.id },
+  })
 
   if (!existingUser) {
-    await firestoreService.createUser({
-      id: user.id,
-      email: user.email,
+    await db.user.create({
+      data: {
+        id: user.id,
+        email: user.email,
+      },
     })
   }
 
