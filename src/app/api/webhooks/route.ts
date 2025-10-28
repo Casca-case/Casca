@@ -6,7 +6,8 @@ import Stripe from 'stripe'
 import { Resend } from 'resend'
 import OrderReceivedEmail from '@/components/emails/0rderReceivedEmail'
 
-const resend=new Resend(process.env.RESEND_API_KEY)
+const resendApiKey = process.env.RESEND_API_KEY
+const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 export async function POST(req: Request) {
   try {
@@ -69,24 +70,28 @@ export async function POST(req: Request) {
         },
       })
 
+      if (resend) {
         await resend.emails.send({
-        from: 'casca.case@gmail.com',
-        to: [session.customer_details.email],
-        subject: 'Thank you for your order!',
-        react: OrderReceivedEmail({
-          orderId,
-          orderDate: updatedOrder.createdAt.toLocaleDateString(),
-          shippingAddress: {
-            name: session.customer_details.name || '',
-            city: shippingAddress?.city || '',
-            country: shippingAddress?.country || '',
-            postalCode: shippingAddress?.postal_code || '',
-            state: shippingAddress?.state || '',
-            id: '',
-            phoneNumber: null
-          },
-        }),
-      })
+          from: 'casca.case@gmail.com',
+          to: [session.customer_details.email],
+          subject: 'Thank you for your order!',
+          react: OrderReceivedEmail({
+            orderId,
+            orderDate: updatedOrder.createdAt.toLocaleDateString(),
+            shippingAddress: {
+              name: session.customer_details.name || '',
+              city: shippingAddress?.city || '',
+              country: shippingAddress?.country || '',
+              postalCode: shippingAddress?.postal_code || '',
+              state: shippingAddress?.state || '',
+              id: '',
+              phoneNumber: null,
+            },
+          }),
+        })
+      } else {
+        console.warn('RESEND_API_KEY missing — skipping confirmation email send.')
+      }
     }
 
     return NextResponse.json({ result: event, ok: true })
