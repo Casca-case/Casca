@@ -106,7 +106,7 @@ export const getAuthStatus = async () => {
     throw new Error('Invalid user data')
   }
 
-  const existingUser = await db.user.findFirst({
+  const existingUser = await db.user.findUnique({
     where: { id: user.id },
   })
 
