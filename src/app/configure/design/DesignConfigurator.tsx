@@ -1,4 +1,4 @@
-//Design Configurator
+ //Design Configurator
 "use client";
 
 import HandleComponent from "@/components/HandleComponent";
@@ -8,7 +8,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from "react-rnd";
 import { RadioGroup } from "@headlessui/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   COLORS,
   FINISHES,
@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
+import { ArrowRight, Check, ChevronsUpDown, Heart } from "lucide-react";
 import { BASE_PRICE } from "@/config/products";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/components/ui/use-toast";
@@ -88,6 +88,77 @@ const DesignConfigurator = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { startUpload } = useUploadThing("imageUploader");
+
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  useEffect(() => {
+    // Check if configuration is in wishlist
+    const checkWishlist = async () => {
+      try {
+        const response = await fetch('/api/wishlist');
+        if (response.ok) {
+          const data = await response.json();
+          const inWishlist = data.wishlist.some((item: any) => item.configurationId === configId);
+          setIsInWishlist(inWishlist);
+        }
+      } catch (error) {
+        console.error('Error checking wishlist:', error);
+      }
+    };
+
+    checkWishlist();
+  }, [configId]);
+
+  const toggleWishlist = async () => {
+    try {
+      if (isInWishlist) {
+        // Remove from wishlist
+        const response = await fetch('/api/wishlist', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: configId }),
+        });
+        if (response.ok) {
+          setIsInWishlist(false);
+          toast({
+            title: "Removed from wishlist",
+            description: "This configuration has been removed from your wishlist.",
+          });
+        }
+      } else {
+        // Add to wishlist
+        const response = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            configurationId: configId,
+            imageUrl: imageUrl,
+            title: "Custom Phone Case",
+            description: "",
+            userId: "user123"
+          }),
+        });
+        if (response.ok) {
+          setIsInWishlist(true);
+          toast({
+            title: "Added to wishlist",
+            description: "This configuration has been added to your wishlist.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      toast({
+        title: "Something went wrong",
+        description: "There was an error updating your wishlist. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   async function saveConfiguration() {
     try {
@@ -388,14 +459,28 @@ const DesignConfigurator = ({
 
         <div className="sticky bottom-0 w-full px-8 h-20 bg-white border-t border-zinc-200">
           <div className="w-full h-full flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-600 text-sm">Total:</span>
-              <p className="font-semibold text-xl">
-                {formatPrice(
-                  (BASE_PRICE + options.finish.price + options.material.price) /
-                    100
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleWishlist}
+                className={cn(
+                  "flex items-center gap-2",
+                  isInWishlist && "bg-red-50 border-red-200 text-red-600 hover:bg-red-100"
                 )}
-              </p>
+              >
+                <Heart className={cn("h-4 w-4", isInWishlist && "fill-current")} />
+                {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
+              </Button>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600 text-sm">Total:</span>
+                <p className="font-semibold text-xl">
+                  {formatPrice(
+                    (BASE_PRICE + options.finish.price + options.material.price) /
+                      100
+                  )}
+                </p>
+              </div>
             </div>
             <Button
               onClick={() =>
