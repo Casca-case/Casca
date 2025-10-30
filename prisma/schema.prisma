@@ -2,16 +2,20 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum OrderStatus {
-  fulfilled
-  shipped
-  awaiting_shipment
-}
+
 
 enum PhoneModel {
   iphonex
@@ -68,8 +72,8 @@ model User {
   Order Order[]
   Wishlist Wishlist[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Order {
@@ -80,7 +84,12 @@ model Order {
   userId          String
   amount          Float
   isPaid          Boolean       @default(true)
-  status          OrderStatus   @default(awaiting_shipment)
+  status          OrderStatus   @default(PENDING)
+  trackingId      String?
+  trackingUrl     String?
+  estimatedDelivery DateTime?
+  cancelReason    String?
+  cancelledAt     DateTime?
 
   shippingAddress   ShippingAddress? @relation(fields: [shippingAddressId], references: [id])
   shippingAddressId String?
@@ -88,7 +97,7 @@ model Order {
   billingAddressId  String?
 
   createdAt DateTime @default(now())
-  updated   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model ShippingAddress {
