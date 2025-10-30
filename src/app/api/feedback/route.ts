@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/db'
+import { db } from '@/lib/firebase'
+import { collection, addDoc } from "firebase/firestore";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,20 +22,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
     }
 
-    // Create feedback in DB
-    const feedback = await db.feedback.create({
-      data: {
-        category: body.category,
-        nps: body.nps,
-        message: body.message,
-        images: body.images || null,
-        email: body.email || null,
-        okToContact: body.okToContact,
-        consent: body.consent,
-      },
-    })
+    // Create feedback in Firestore
+    const docRef = await addDoc(collection(db, "feedback"), {
+      category: body.category,
+      nps: body.nps,
+      message: body.message,
+      images: body.images || [],
+      email: body.email || null,
+      okToContact: body.okToContact,
+      consent: body.consent,
+      createdAt: new Date().toISOString(),
+    });
 
-    return NextResponse.json({ success: true, id: feedback.id }, { status: 201 })
+    return NextResponse.json({ success: true, id: docRef.id }, { status: 201 })
   } catch (error) {
     console.error('Feedback submission error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
