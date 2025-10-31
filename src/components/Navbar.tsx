@@ -92,6 +92,15 @@ const Navbar = async () => {
 
                 {/* Create Case */}
                 <Link
+                  href="/wishlist"
+                  className={buttonVariants({
+                    size: "sm",
+                    variant: "ghost",
+                  })}
+                >
+                  Wishlist
+                </Link>
+                <Link
                   href="/configure/upload"
                   className={buttonVariants({
                     size: "sm",

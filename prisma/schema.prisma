@@ -63,17 +63,14 @@ model Configuration {
   finish          CaseFinish?
   croppedImageUrl String?
   Order           Order[]
+  Wishlist        Wishlist[]
 }
 
 model User {
-  id          String  @id @default(cuid())
-  email       String  @unique
-  firstName   String?
-  lastName    String?
-  phone       String?
-  address     String?
-  picture     String?
-  Order       Order[]
+  id    String  @id @default(cuid())
+  email String
+  Order Order[]
+  Wishlist Wishlist[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -136,4 +133,16 @@ model Feedback {
   consent     Boolean
 
   createdAt   DateTime @default(now())
+}
+
+model Wishlist {
+  id              String      @id @default(cuid())
+  userId          String
+  configurationId String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  configuration   Configuration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, configurationId])
 }
