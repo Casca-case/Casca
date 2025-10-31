@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -12,6 +13,7 @@ import {
 } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 interface RevenueDatum {
   date: string
@@ -26,11 +28,32 @@ const currencyFormatter = new Intl.NumberFormat('en-IN', {
   maximumFractionDigits: 0,
 })
 
-const RevenueChart = ({ data }: { data: RevenueDatum[] }) => {
+const RevenueChart = ({ dailyData, monthlyData }: { dailyData: RevenueDatum[], monthlyData: RevenueDatum[] }) => {
+  const [viewMode, setViewMode] = useState<'days' | 'months'>('days')
+  const data = viewMode === 'days' ? dailyData : monthlyData
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle>Revenue trend</CardTitle>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'days' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('days')}
+            className={viewMode === 'days' ? 'bg-orange-600 hover:bg-orange-700' : ''}
+          >
+            Days
+          </Button>
+          <Button
+            variant={viewMode === 'months' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('months')}
+            className={viewMode === 'months' ? 'bg-orange-600 hover:bg-orange-700' : ''}
+          >
+            Months
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className='h-[320px]'>
         <ResponsiveContainer width='100%' height='100%'>

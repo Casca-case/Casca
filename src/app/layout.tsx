@@ -9,6 +9,7 @@ import Chatbot from "./configure/chatbot/page";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import Script from "next/script";
 import CookieBanner from "@/components/CookieBanner";
+import { Toaster } from "@/components/ui/toaster";
 
 const recursive = Recursive({ subsets: ["latin"] });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
         </main>
         <CookieBanner />
         <GoogleTranslate />
+        <Toaster />
         <Script
           src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
           strategy="afterInteractive"

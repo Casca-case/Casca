@@ -8,8 +8,11 @@ import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import Slider3D from "./Slider3D";
 import ReviewsSection from "@/components/ReviewsSection";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-export default function page() {
+export default async function page() {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   // Slider settings
   const settings = {
     dots: true,
@@ -191,7 +194,12 @@ export default function page() {
         </MaxWidthWrapper>
       </section>
       {/* Reviews Section */}
-      <ReviewsSection />
+      <ReviewsSection 
+        isAuthenticated={!!user}
+        userId={user?.id}
+        userName={`${user?.given_name || ""} ${user?.family_name || ""}`.trim() || user?.email?.split("@")[0]}
+        userAvatar={user?.picture || undefined}
+      />
     
     </div>
   );

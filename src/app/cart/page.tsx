@@ -7,10 +7,14 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ShoppingCart, Trash2, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { createCartCheckoutSession } from "./actions"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function CartPage() {
   const [items, setItems] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { toast } = useToast()
 
   useEffect(() => {
     function readItems() {
@@ -35,6 +39,32 @@ export default function CartPage() {
     setItems(next)
     localStorage.setItem("cart", JSON.stringify(next))
     window.dispatchEvent(new Event('cart:updated'))
+  }
+
+  async function handleCheckout() {
+    if (items.length === 0) return
+
+    setIsLoading(true)
+    try {
+      const { url } = await createCartCheckoutSession({ cartItems: items })
+      
+      if (url) {
+        // Clear cart after creating checkout session
+        localStorage.setItem("cart", JSON.stringify([]))
+        window.dispatchEvent(new Event('cart:updated'))
+        
+        // Redirect to Stripe checkout
+        window.location.href = url
+      }
+    } catch (error) {
+      console.error("Checkout error:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to proceed to checkout. Please try again.",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+    }
   }
 
   const totalPrice = items.length * 299
@@ -103,8 +133,13 @@ export default function CartPage() {
                     <span className="text-orange-600">₹{totalPrice.toLocaleString()}</span>
                   </div>
                 </div>
-                <Button onClick={() => router.push('/thank-you')} className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 text-lg font-semibold" size="lg">
-                  Proceed to Checkout
+                <Button 
+                  onClick={handleCheckout} 
+                  disabled={isLoading}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 text-lg font-semibold" 
+                  size="lg"
+                >
+                  {isLoading ? "Processing..." : "Proceed to Checkout"}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>

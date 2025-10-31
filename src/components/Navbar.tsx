@@ -92,15 +92,6 @@ const Navbar = async () => {
 
                 {/* Create Case */}
                 <Link
-                  href="/wishlist"
-                  className={buttonVariants({
-                    size: "sm",
-                    variant: "ghost",
-                  })}
-                >
-                  Wishlist
-                </Link>
-                <Link
                   href="/configure/upload"
                   className={buttonVariants({
                     size: "sm",
@@ -164,17 +155,6 @@ const Navbar = async () => {
             ) : (
               <>
                 {/* Unauthenticated Links */}
-                <RegisterLink
-                  className={buttonVariants({ size: "sm", variant: "ghost" })}
-                >
-                  Sign Up
-                </RegisterLink>
-                <LoginLink
-                  className={buttonVariants({ size: "sm", variant: "ghost" })}
-                >
-                  Login
-                </LoginLink>
-
                 <Link
                   href="/gallery"
                   className={buttonVariants({ size: "sm", variant: "ghost" })}
@@ -188,21 +168,27 @@ const Navbar = async () => {
                   Reviews
                 </Link>
 
-                <WishlistButton />
-                <CartButton />
+                <RegisterLink
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Sign Up
+                </RegisterLink>
+                <LoginLink
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Login
+                </LoginLink>
 
-                <div className="h-8 bg-zinc-200 hidden sm:block">
-                  <Link
-                    href="/configure/upload"
-                    className={buttonVariants({
-                      size: "sm",
-                      className: "hidden sm:flex items-center gap-1",
-                    })}
-                  >
-                    Create Case
-                    <ArrowRight className="ml-1.5 h-5 w-5" />
-                  </Link>
-                </div>
+                <Link
+                  href="/configure/upload"
+                  className={buttonVariants({
+                    size: "sm",
+                    className: "hidden sm:flex items-center gap-1",
+                  })}
+                >
+                  Create Case
+                  <ArrowRight className="ml-1.5 h-5 w-5" />
+                </Link>
               </>
             )}
           </div>

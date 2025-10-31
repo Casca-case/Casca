@@ -45,18 +45,25 @@ export default function GalleryItem({ src, title, popular, alt }: Props) {
 
   async function handleAddToCart() {
     try {
-      // Use the original image URL directly - no Firebase upload needed for gallery items
-      const imageUrl = src
+      // Create a real configuration for the gallery item
+      const res = await fetch("/api/gallery/create-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: src }),
+      })
 
-      // Generate a temporary configId for cart functionality
-      const configId = `temp-${Date.now()}-${Math.random().toString(36).substring(2)}`
+      if (!res.ok) throw new Error("Failed to create configuration")
+
+      const { configId } = await res.json()
+
+      if (!configId) throw new Error("Invalid configId returned from API")
 
       // Get existing cart from localStorage
       const existing = localStorage.getItem("cart")
       const cart = existing ? JSON.parse(existing) : []
 
-      // Add new item to cart
-      cart.push({ configId, imageUrl, addedAt: Date.now() })
+      // Add new item to cart with real configId
+      cart.push({ configId, imageUrl: src, addedAt: Date.now() })
 
       // Save updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(cart))

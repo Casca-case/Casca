@@ -24,9 +24,11 @@ import RevenueChart from './RevenueChart'
 import OrderStatusChart from './OrderStatusChart'
 
 const STATUS_LABELS: Record<string, string> = {
-  awaiting_shipment: 'Awaiting Shipment',
-  shipped: 'Shipped',
-  fulfilled: 'Fulfilled',
+  PENDING: 'Pending',
+  PROCESSING: 'Processing',
+  SHIPPED: 'Shipped',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
 }
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-IN', {
@@ -125,11 +127,12 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-IN', {
       new Map<string, { revenue: number; orders: number }>()
     )
 
+    // Daily data for last 30 days
     const daysToShow = 30
     const startDate = new Date(now)
     startDate.setDate(now.getDate() - (daysToShow - 1))
 
-    const revenueData = Array.from({ length: daysToShow }, (_, index) => {
+    const dailyRevenueData = Array.from({ length: daysToShow }, (_, index) => {
       const date = new Date(startDate)
       date.setDate(startDate.getDate() + index)
       const isoKey = date.toISOString().split('T')[0]
@@ -137,6 +140,52 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-IN', {
 
       return {
         date: DATE_FORMATTER.format(date),
+        revenue: Math.round(stats.revenue * 100) / 100,
+        orders: stats.orders,
+      }
+    })
+
+    // Monthly data for last 12 months
+    const monthlyRevenueAccumulator = new Map<string, { revenue: number; orders: number }>()
+    
+    // Fetch orders from last 12 months
+    const twelveMonthsAgo = new Date(now)
+    twelveMonthsAgo.setMonth(now.getMonth() - 12)
+    
+    const yearlyOrders = await db.order.findMany({
+      where: {
+        isPaid: true,
+        createdAt: {
+          gte: twelveMonthsAgo,
+        },
+      },
+      select: {
+        createdAt: true,
+        amount: true,
+      },
+    })
+
+    yearlyOrders.forEach((order) => {
+      const monthKey = `${order.createdAt.getFullYear()}-${String(order.createdAt.getMonth() + 1).padStart(2, '0')}`
+      const entry = monthlyRevenueAccumulator.get(monthKey) ?? { revenue: 0, orders: 0 }
+      entry.revenue += order.amount
+      entry.orders += 1
+      monthlyRevenueAccumulator.set(monthKey, entry)
+    })
+
+    const MONTH_FORMATTER = new Intl.DateTimeFormat('en-IN', {
+      month: 'short',
+      year: 'numeric',
+    })
+
+    const monthlyRevenueData = Array.from({ length: 12 }, (_, index) => {
+      const date = new Date(now)
+      date.setMonth(now.getMonth() - (11 - index))
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      const stats = monthlyRevenueAccumulator.get(monthKey) ?? { revenue: 0, orders: 0 }
+
+      return {
+        date: MONTH_FORMATTER.format(date),
         revenue: Math.round(stats.revenue * 100) / 100,
         orders: stats.orders,
       }
@@ -218,7 +267,7 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-IN', {
 
             <div className='grid gap-4 lg:grid-cols-7'>
               <div className='lg:col-span-4'>
-                <RevenueChart data={revenueData} />
+                <RevenueChart dailyData={dailyRevenueData} monthlyData={monthlyRevenueData} />
               </div>
               <div className='lg:col-span-3'>
                 <OrderStatusChart data={orderStatusData} />
