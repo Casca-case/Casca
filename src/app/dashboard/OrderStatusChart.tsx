@@ -3,7 +3,7 @@
 import { Pie, PieChart, Cell, Legend, ResponsiveContainer, Tooltip } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const COLORS = ['#34d399', '#fb923c', '#60a5fa']
+const COLORS = ['#fb923c', '#60a5fa', '#34d399', '#a78bfa', '#f87171']
 
 interface StatusDatum {
   status: string
@@ -30,22 +30,23 @@ const OrderStatusChart = ({ data }: { data: StatusDatum[] }) => {
               outerRadius={100}
               paddingAngle={4}
               dataKey='count'
+              nameKey='status'
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${entry.status}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => `${value} orders`}
-              labelFormatter={(label) => label}
+              formatter={(value: number, name: string) => [`${value} orders`, name]}
               contentStyle={{ borderRadius: 8, borderColor: '#e5e7eb' }}
             />
             <Legend
               layout='vertical'
               align='right'
               verticalAlign='middle'
-              formatter={(value, entry, index) => {
-                const count = data[index]?.count ?? 0
+              formatter={(value, entry: any) => {
+                const item = data.find(d => d.status === value)
+                const count = item?.count ?? 0
                 const percent = total === 0 ? 0 : Math.round((count / total) * 100)
                 return `${value} (${percent}%)`
               }}

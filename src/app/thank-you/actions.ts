@@ -11,8 +11,15 @@ export const getPaymentStatus = async ({ orderId }: { orderId: string }) => {
         throw new Error('You need to be logged in to view this page.')
     }
 
+    // Handle multiple order IDs (comma-separated)
+    const orderIds = orderId.includes(',') ? orderId.split(',') : [orderId]
+    
+    // Get the first order (or only order)
     const order = await db.order.findFirst({
-        where: { id: orderId, userId: user.id },
+        where: { 
+          id: orderIds[0], 
+          userId: user.id 
+        },
         include: {
             billingAddress: true,
             configuration: true,

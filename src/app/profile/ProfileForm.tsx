@@ -104,66 +104,117 @@ export default function ProfileForm({ user }: ProfileFormProps) {
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-8 md:p-10 shadow-xl border-2 border-gray-100 bg-white/80 backdrop-blur">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Full Name */}
           <FormField
             control={form.control}
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-base font-semibold text-gray-700">
+                  Full Name
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your full name" {...field} />
+                  <Input 
+                    placeholder="Enter your full name" 
+                    {...field} 
+                    className="h-12 text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/* Email */}
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-base font-semibold text-gray-700">
+                  Email
+                </FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter your email" {...field} disabled />
+                  <Input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    {...field} 
+                    disabled 
+                    className="h-12 text-base bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed"
+                  />
                 </FormControl>
+                <p className="text-sm text-gray-500 mt-1">
+                  Email cannot be changed
+                </p>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/* Phone Number */}
           <FormField
             control={form.control}
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel className="text-base font-semibold text-gray-700">
+                  Phone Number
+                </FormLabel>
                 <FormControl>
-                  <Input type="tel" placeholder="Enter your phone number" {...field} />
+                  <Input 
+                    type="tel" 
+                    placeholder="Enter your phone number" 
+                    {...field} 
+                    className="h-12 text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/* Address */}
           <FormField
             control={form.control}
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel className="text-base font-semibold text-gray-700">
+                  Address
+                </FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Enter your address" {...field} />
+                  <Textarea 
+                    placeholder="Enter your address" 
+                    {...field} 
+                    rows={4}
+                    className="text-base border-gray-300 focus:border-orange-500 focus:ring-orange-500 resize-none"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="flex gap-4">
-            <LoadingButton type="button" variant="outline" onClick={() => form.reset()} disabled={isUpdating} isLoading={isUpdating}>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <LoadingButton 
+              type="button" 
+              variant="outline" 
+              onClick={() => form.reset()} 
+              disabled={isUpdating} 
+              isLoading={false}
+              className="h-12 text-base font-semibold border-2 hover:bg-gray-50"
+            >
               Reset
             </LoadingButton>
-            <LoadingButton type="submit" isLoading={isUpdating}>
+            <LoadingButton 
+              type="submit" 
+              isLoading={isUpdating}
+              className="h-12 text-base font-semibold bg-orange-600 hover:bg-orange-700 flex-1"
+            >
               Save Changes
             </LoadingButton>
           </div>

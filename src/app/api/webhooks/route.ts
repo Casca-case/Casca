@@ -31,44 +31,64 @@ export async function POST(req: Request) {
         throw new Error('Missing user email')
       }
 
-      const { userId, orderId } = session.metadata || {
+      const { userId, orderId, orderIds } = session.metadata || {
         userId: null,
         orderId: null,
+        orderIds: null,
       }
 
-      if (!userId || !orderId) {
+      if (!userId || (!orderId && !orderIds)) {
         throw new Error('Invalid request metadata')
       }
 
       const billingAddress = session.customer_details?.address
       const shippingAddress = session.shipping_details?.address
 
-      const updatedOrder = await db.order.update({
-        where: {
-          id: orderId,
-        },
-        data: {
-          isPaid: true,
-          shippingAddress: {
-            create: {
-              name: session.customer_details.name || '',
-              city: shippingAddress?.city || '',
-              country: shippingAddress?.country || '',
-              postalCode: shippingAddress?.postal_code || '',
-              state: shippingAddress?.state || '',
+      // Handle multiple orders (from cart) or single order
+      const orderIdsArray = orderIds 
+        ? orderIds.split(',') 
+        : orderId 
+        ? [orderId] 
+        : []
+
+      // Update all orders
+      await Promise.all(
+        orderIdsArray.map((id) =>
+          db.order.update({
+            where: { id },
+            data: {
+              isPaid: true,
+              shippingAddress: {
+                create: {
+                  name: session.customer_details!.name || '',
+                  city: shippingAddress?.city || '',
+                  country: shippingAddress?.country || '',
+                  postalCode: shippingAddress?.postal_code || '',
+                  state: shippingAddress?.state || '',
+                },
+              },
+              billingAddress: {
+                create: {
+                  name: session.customer_details!.name || '',
+                  city: billingAddress?.city || '',
+                  country: billingAddress?.country || '',
+                  postalCode: billingAddress?.postal_code || '',
+                  state: billingAddress?.state || '',
+                },
+              },
             },
-          },
-          billingAddress: {
-            create: {
-              name: session.customer_details.name || '',
-              city: billingAddress?.city || '',
-              country: billingAddress?.country || '',
-              postalCode: billingAddress?.postal_code || '',
-              state: billingAddress?.state || '',
-            },
-          },
-        },
+          })
+        )
+      )
+
+      // Get the first order for email
+      const updatedOrder = await db.order.findUnique({
+        where: { id: orderIdsArray[0] },
       })
+
+      if (!updatedOrder) {
+        throw new Error('Order not found')
+      }
 
       if (resend) {
         await resend.emails.send({
@@ -76,7 +96,7 @@ export async function POST(req: Request) {
           to: [session.customer_details.email],
           subject: 'Thank you for your order!',
           react: OrderReceivedEmail({
-            orderId,
+            orderId: orderIdsArray[0],
             orderDate: updatedOrder.createdAt.toLocaleDateString(),
             shippingAddress: {
               name: session.customer_details.name || '',
