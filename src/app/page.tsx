@@ -7,7 +7,7 @@ import React from "react";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import Slider3D from "./Slider3D";
-
+import ReviewsSection from "@/components/ReviewsSection";
 
 export default function page() {
   // Slider settings
@@ -190,6 +190,9 @@ export default function page() {
           </ul>
         </MaxWidthWrapper>
       </section>
+      {/* Reviews Section */}
+      <ReviewsSection />
+    
     </div>
   );
 }
