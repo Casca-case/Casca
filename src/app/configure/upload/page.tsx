@@ -129,12 +129,35 @@ const Page = () => {
     try {
       const response = await fetch("/api/image", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(values),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+
+      if (!data.success || !data.url) {
+        throw new Error(data.error || 'Failed to generate image');
+      }
+
       const img = new Image();
       img.crossOrigin = "anonymous"; 
       img.src = data.url;
+
+      img.onerror = () => {
+        console.error("Failed to load generated image");
+        toast({
+          title: "Error",
+          description: "Failed to load the generated image. Please try again.",
+          variant: "destructive",
+        });
+        setloading(false);
+      };
 
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -149,6 +172,7 @@ const Page = () => {
             description: "Unable to create 2D context for canvas.",
             variant: "destructive",
           });
+          setloading(false);
           return;
         }
 
@@ -158,15 +182,15 @@ const Page = () => {
         const convertedImage = canvas.toDataURL(imageType);
 
         setoutputImg(convertedImage);
+        setloading(false);
       }
     } catch (error) {
       console.error("Error generating image:", error);
       toast({
         title: "Error",
-        description: "Failed to generate image. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate image. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setloading(false);
     }
   }
