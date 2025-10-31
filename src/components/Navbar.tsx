@@ -1,8 +1,15 @@
+
 import React from "react";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
-import { ArrowRight, User as UserIcon, PackageOpen, LogOut } from "lucide-react";
+import {
+  ArrowRight,
+  User as UserIcon,
+  PackageOpen,
+  LogOut,
+  Heart,
+} from "lucide-react";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Image from "next/image";
 import {
@@ -23,25 +30,55 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import CartButton from "@/components/CartButton";
+import WishlistButton from "@/components/Wishlist";
 
 const Navbar = async () => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
-
   const isAdmin = user?.email === process.env.ADMIN_EMAIL;
 
   return (
-    <nav className="sticky z-[100] h-14 inset-x-0 top-0 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
+    <nav className="sticky top-0 inset-x-0 z-[100] h-14 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
       <MaxWidthWrapper>
         <div className="flex h-14 items-center justify-between border-b border-zinc-200">
-          <Link href="/" className="flex z-40 font-semibold">
+          {/* Logo */}
+          <Link href="/" className="flex z-40 font-semibold text-lg">
             CΛS<span className="text-orange-600">CA</span>
           </Link>
 
-          <div className="h-full flex items-center space-x-4">
+          {/* Right side */}
+          <div className="flex items-center space-x-4 h-full">
             {user ? (
               <>
-                {isAdmin ? (
+                {/* Gallery & Reviews */}
+                <Link
+                  href="/gallery"
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Gallery
+                </Link>
+                <Link
+                  href="/#reviews"
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Reviews
+                </Link>
+
+                {/* Wishlist & Cart */}
+                <Link
+                  href="/wishlist"
+                  className={buttonVariants({
+                    size: "sm",
+                    variant: "ghost",
+                  })}
+                >
+                  Wishlist
+                </Link>
+                <CartButton />
+
+                {/* Admin Dashboard */}
+                {isAdmin && (
                   <Link
                     href="/dashboard"
                     className={buttonVariants({
@@ -51,7 +88,9 @@ const Navbar = async () => {
                   >
                     Dashboard
                   </Link>
-                ) : null}
+                )}
+
+                {/* Create Case */}
                 <Link
                   href="/configure/upload"
                   className={buttonVariants({
@@ -63,6 +102,7 @@ const Navbar = async () => {
                   <ArrowRight className="ml-1.5 h-5 w-5" />
                 </Link>
 
+                {/* User dropdown */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -82,11 +122,12 @@ const Navbar = async () => {
                             </span>
                           )}
                         </DropdownMenuTrigger>
+
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem asChild>
                             <Link href="/profile" className="flex items-center gap-2">
                               <UserIcon className="h-4 w-4" />
-                              View Full Profile
+                              View Profile
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
@@ -113,23 +154,33 @@ const Navbar = async () => {
               </>
             ) : (
               <>
+                {/* Unauthenticated Links */}
                 <RegisterLink
-                  className={buttonVariants({
-                    size: "sm",
-                    variant: "ghost",
-                  })}
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
                 >
                   Sign Up
                 </RegisterLink>
-
                 <LoginLink
-                  className={buttonVariants({
-                    size: "sm",
-                    variant: "ghost",
-                  })}
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
                 >
                   Login
                 </LoginLink>
+
+                <Link
+                  href="/gallery"
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Gallery
+                </Link>
+                <Link
+                  href="/#reviews"
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  Reviews
+                </Link>
+
+                <WishlistButton />
+                <CartButton />
 
                 <div className="h-8 bg-zinc-200 hidden sm:block">
                   <Link
